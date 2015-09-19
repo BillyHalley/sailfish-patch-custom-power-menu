@@ -1,0 +1,16 @@
+{
+    "translation_catalog": "b-halley-custom-power-menu",
+    "entries": [
+        {
+            "path": "system_settings/look_and_feel/b-halley-custom-power-menu",
+            "type": "page",
+            "title": "Powermenu Controls",
+            "icon": "/usr/share/jolla-settings/pages/b-halley-custom-power-menu/icon-m-powermenu.png",
+            "order": 542,
+            "params": {
+                "source": "/usr/share/jolla-settings/pages/b-halley-custom-power-menu/LockPage.qml"
+            }
+        }
+    ]
+}
+

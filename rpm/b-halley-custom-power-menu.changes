@@ -1,0 +1,25 @@
+# Rename this file as patch-custom-power-menu.changes to include changelog
+# entries in your RPM file.
+#
+# Add new changelog entries following the format below.
+# Add newest entries to the top of the list.
+# Separate entries from eachother with a blank line.
+
+# * date Author's Name <author's email> version-release
+# - Summary of changes
+
+* Sat Sep 19 2015 Billy Halley <ziobilly94@gmail.com> 0.3.1-1
+v 0.3.1
+- Included Quick Button options for Power Key Menu
+
+v 0.2.3
+- Fixed remove buttons
+
+v 0.2.2
+- Fixed Quick Buttons
+- Fixed remove buttons
+
+v 0.0.2
+- Included Quick Button actions with Swipe ( Swipe to Lock )
+
+

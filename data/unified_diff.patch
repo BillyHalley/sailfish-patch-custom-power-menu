@@ -1,0 +1,404 @@
+diff --git /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
+index adf3ab2..98f8206 100644
+--- /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
++++ /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
+@@ -1,19 +1,73 @@
+ import QtQuick 2.2
+ import Sailfish.Silica 1.0
+ 
+-MouseArea {
++Item {
+     id: button
+ 
+-    property url iconSource
+-    property alias icon: icon
+-    readonly property bool down: pressed || pressTimer.running
++    property string type
++    property bool labelVisible
++    signal click()
++
++    visible: type !== "empty"
+ 
++    property string iconSource: {
++        if ( type === "shutdown" )
++            "image://theme/graphic-power-off"
++        else if ( type === "lock" )
++            "image://theme/graphic-display-blank"
++        else if ( type === "reboot" )
++            "image://theme/graphic-reboot"
++        else if ( type === "lipstick" )
++            "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-restart-lipstick.png"
++        else if ( type === "profile" )
++            profileControl.profile === "silent" ? "image://theme/graphic-sound-silent-off" : "image://theme/graphic-sound-silent-on"
++        else if ( type === "app" )
++            ""
++        else if ( type === "empty" )
++            ""
++    }
++
++    property string labelText: {
++        switch ( type ) {
++        case "shutdown":
++            return "Shutdown"
++            break
++        case "lock":
++            return "Lock"
++            break
++        case "reboot":
++            return "Reboot"
++            break
++        case "lipstick":
++            return "Restart HS"
++            break
++        case "profile":
++            return profileControl.profile === "silent" ? "Enable Sounds" : "Disable Sounds"
++            break
++        case "app":
++            break
++        case "empty":
++            break
++        }
++    }
++
++    property alias icon: icon
+     property alias offset: content.y
+ 
++    readonly property bool down: mouseArea.pressed || pressTimer.running
++
++    MouseArea {
++        id: mouseArea
++        anchors.fill: parent
++        onClicked:{
++            click()
++        }
++    }
++
+     PauseAnimation {
+         id: pressTimer
+         alwaysRunToEnd: true
+-        running: button.pressed
++        running: mouseArea.pressed
+         duration: 50
+     }
+ 
+@@ -24,12 +78,9 @@ MouseArea {
+         height: button.height
+ 
+         color: Theme.rgba(Theme.highlightBackgroundColor, Theme.highlightBackgroundOpacity)
+-
+         Image {
+             id: icon
+-
+             anchors.centerIn: parent
+-
+             source: button.down
+                     ? button.iconSource + "?" + Theme.highlightColor
+                     : button.iconSource
+@@ -37,5 +88,19 @@ MouseArea {
+             width: Theme.iconSizeLauncher
+             height: Theme.iconSizeLauncher
+         }
++
++        Label {
++            id: label
++            width: parent.width - Theme.paddingSmall
++            anchors {
++                horizontalCenter: parent.horizontalCenter
++                bottom: parent.bottom
++            }
++            truncationMode: TruncationMode.Fade
++            horizontalAlignment: contentWidth > width ? Text.AlignLeft : Text.AlignHCenter
++            text: labelText
++            color: Theme.secondaryColor
++            visible: labelVisible
++        }
+     }
+ }
+diff --git /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
+index c9a663e..6d52389 100644
+--- /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
++++ /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
+@@ -9,20 +9,65 @@ import org.nemomobile.dbus 2.0
+ import com.jolla.lipstick 0.1
+ import org.freedesktop.contextkit 1.0
+ import org.nemomobile.notifications 1.0 as SystemNotifications
++import org.nemomobile.configuration 1.0
++import org.nemomobile.systemsettings 1.0
+ 
+ SilicaListView {
+     id: powerMenu
+ 
++    ConfigurationGroup {
++        id: powermenuSettings
++        path: "/desktop/lipstick-jolla-home-qt5/custompowerkey/settings"
++        property bool lockLabels: true
++        property bool powerLabels: true
++        property variant powerArray: ["shutdown"]
++        property variant lockArray: ["lock"]
++        property variant quickOrder: [0]
++        property real lockInterval: 1
++        property int quickPower: 0
++        property real powerInterval: 1
++    }
++
++    DBusInterface {
++        id: systemdServiceIface
++        bus: DBus.SessionBus
++        service: 'org.freedesktop.systemd1'
++        path: '/org/freedesktop/systemd1/unit/lipstick_2eservice'
++        iface: 'org.freedesktop.systemd1.Unit'
++    }
++
++    ProfileControl {
++        id: profileControl
++    }
++
++    function action(type) {
++        if ( type === "shutdown" )
++            dsmeDbus.call("req_shutdown", [])
++        else if ( type === "lock" )
++            Lipstick.compositor.setDisplayOff()
++        else if ( type === "reboot" )
++            dsmeDbus.call("req_reboot", [])
++        else if ( type === "lipstick" )
++            systemdServiceIface.call("Restart", ["replace"])
++        else if ( type === "profile" )
++            profileControl.profile = profileControl.profile === "silent" ? "ambience" : "silent"
++        else if ( type === "app" ) {
++            
++        } else if ( type === "empty" ) {
++            
++        }
++    }
++
+     property real itemHeight: Screen.sizeCategory >= Screen.Large
+-        ? Theme.itemSizeExtraLarge + (2 * Theme.paddingLarge)
+-        : Math.floor((Screen.height - bottomStackHeight) / 5)
++                              ? Theme.itemSizeExtraLarge + (2 * Theme.paddingLarge)
++                              : Math.floor((Screen.height - bottomStackHeight) / 5)
+     property int itemCount: 5
+     property int stackCount: 4
+ 
+     readonly property bool largeScreen: Screen.sizeCategory >= Screen.Large
+     readonly property real exposure: currentItem
+-            ? Lipstick.compositor.powerKeyLayer.absoluteExposure + currentItem.height - itemHeight
+-            : Lipstick.compositor.powerKeyLayer.absoluteExposure
++                                     ? Lipstick.compositor.powerKeyLayer.absoluteExposure + currentItem.height - itemHeight
++                                     : Lipstick.compositor.powerKeyLayer.absoluteExposure
+     readonly property real stackedItemHeight: Theme.paddingSmall
+     readonly property real bottomStackHeight: Math.max(0, stackedItemHeight*Math.min((powerMenu.count-itemCount+1), stackCount))
+ 
+@@ -89,14 +134,14 @@ SilicaListView {
+ 
+         states: [
+             State {
+-               name: "no-power"
+-               when: Lipstick.compositor.powerKeyLayer.active && !shutdownButton.visible
++                name: "no-power"
++                when: Lipstick.compositor.powerKeyLayer.active && !shutdownRow.visible
+             }, State {
+                 name: "power"
+-                when: shutdownButton.visible
++                when: shutdownRow.visible
+                 PropertyChanges {
+-                    target: lockButton
+-                    offset: -lockButton.height
++                    target: lockRow
++                    offset: -lockRow.height
+                 }
+             }
+         ]
+@@ -105,7 +150,7 @@ SilicaListView {
+             from: "no-power"
+             to: "power"
+             NumberAnimation {
+-                target: lockButton
++                target: lockRow
+                 property: "offset"
+                 duration: 400
+                 easing.type: Easing.InOutQuad
+@@ -113,44 +158,146 @@ SilicaListView {
+         }
+ 
+         Wallpaper {
+-            anchors.fill: shutdownButton
++            anchors.fill: parent
+             horizontalOffset: powerMenu.x
+         }
+ 
+-        PowerButton {
+-            id: shutdownButton
+-
+-            width: powerMenu.width
+-            height: powerMenu.itemHeight
+-
+-            offset: lockButton.offset + height
+-
+-            clip: powerTransition.running
+-            visible: Lipstick.compositor.powerKeyPressed
+-
+-            onClicked: dsmeDbus.call("req_shutdown", [])
+-
+-            iconSource: "image://theme/graphic-power-off"
++        property variant lockArray: powermenuSettings.lockArray.length === 0 ? ["lock"] : powermenuSettings.lockArray
++        property int lockWidth: powerMenu.width / lockArray.length
++        onLockArrayChanged: {
++            lockModel.clear()
++            for ( var i = 0; i < lockArray.length; i++) {
++                lockModel.append({
++                                     "itemType": lockArray[i]
++                                 })
++            }
++        }
+ 
+-            opacity: Math.max(0.0, Math.min(1.0,
+-                        (powerMenu.exposure - headerItem.y + powerMenu.contentY)
+-                        / headerItem.height))
++        ListModel {
++            id: lockModel
+         }
+ 
+-        PowerButton {
+-            id: lockButton
++        property var powerArray: powermenuSettings.powerArray.length === 0 ? ["shutdown"] : powermenuSettings.powerArray
++        property var powerWidth: powerMenu.width / powerArray.length
++        onPowerArrayChanged: {
++            powerModel.clear()
++            for ( var i = 0; i < powerArray.length; i++) {
++                powerModel.append({
++                                      "itemType": powerArray[i]
++                                  })
++            }
++        }
+ 
+-            width: powerMenu.width
+-            height: powerMenu.itemHeight
++        ListModel {
++            id: powerModel
++        }
+ 
+-            clip: powerTransition.running
+-            visible: !shutdownButton.visible || powerTransition.running
++        Row {
++            id: lockRow
++            width: parent.width
++            height: itemHeight
++            Repeater {
++                id: lockRepeater
++                model: lockModel
++                delegate: PowerButton {
++                    width: lockWidth
++                    height: parent.height
++                    type: itemType
++                    labelVisible: powermenuSettings.lockLabels
++                    onClick: action(type)
++                }
++            }
++            visible: !Lipstick.compositor.powerKeyPressed
++        }
++        Row {
++            id: shutdownRow
++            width: parent.width
++            height: itemHeight
++            Repeater {
++                id: powerRepeater
++                model: powerModel
++                delegate: PowerButton {
++                    width: powerWidth
++                    height: parent.height
++                    type: itemType
++                    labelVisible: powermenuSettings.powerLabels
++                    onClick: action(type)
++                }
++            }
++            visible: Lipstick.compositor.powerKeyPressed
++        }
+ 
+-            onClicked: Lipstick.compositor.setDisplayOff()
++        Component.onCompleted: Lipstick.compositor.powerKeyLayer.edgeFilter.gestureTriggered.connect(activateAction)
+ 
+-            iconSource: "image://theme/graphic-display-blank"
++        function activateAction() {
++            if ( progressTimer.running && !Lipstick.compositor.powerKeyPressed ) {
++                action(lockArray[powermenuSettings.quickOrder[quickControl.index]])
++                progressCircle.value = 0
++                progressTimer.stop()
++            }
++        }
+ 
+-            opacity: shutdownButton.opacity
++        Item {
++            id: quickControl
++            height: parent.height
++            width: Lipstick.compositor.powerKeyPressed
++                   ? parent.width / powerArray.length
++                   : parent.width / lockArray.length
++            x: Lipstick.compositor.powerKeyPressed
++               ? ( parent.width / powerArray.length ) * powermenuSettings.quickPower
++               : ( parent.width / lockArray.length ) * powermenuSettings.quickOrder[index]
++            property int index: 0
++            property real step: Lipstick.compositor.powerKeyPressed
++                                ? Math.pow(powermenuSettings.powerInterval,-1) * 0.01
++                                : Math.pow(powermenuSettings.lockInterval,-1) * 0.01
++            property variant quickOrder: powermenuSettings.quickOrder
++            property int quickPower: powermenuSettings.quickPower
++            visible: progressTimer.running
++            ProgressCircle {
++                id: progressCircle
++                z: 2
++                anchors.centerIn: parent
++                Timer {
++                    id: progressTimer
++                    interval: 10
++                    repeat: true
++                    running: Lipstick.compositor.powerKeyPressed
++                             ? quickControl.quickPower !== -1 && shutdownRow.visible
++                             : Lipstick.compositor.powerKeyLayer.exposed && quickControl.quickOrder.length !== 0
++                    onRunningChanged: {
++                        progressCircle.value = 0
++                        quickControl.index = 0
++                    }
++                    onTriggered: {
++                        progressCircle.value = ( progressCircle.value + quickControl.step )
++                        if ( Lipstick.compositor.powerKeyPressed ) {
++                            if ( progressCircle.value >= 1) {
++                                progressCircle.value = 0
++                                stop()
++                                action(powermenuSettings.powerArray[quickControl.quickPower])
++                            }
++                        } else {
++                            if ( progressCircle.value >= 1 && quickControl.index < quickControl.quickOrder.length) {
++                                progressCircle.value = 0
++                                quickControl.index++
++                            } else if ( quickControl.index === quickControl.quickOrder.length ) {
++                                progressCircle.value = 0
++                                quickControl.index = 0
++                                stop()
++                            }
++                        }
++                    }
++                }
++            }
++        }
++        MouseArea {
++            anchors.fill: parent
++            z: 100
++            onClicked: {
++                progressCircle.value = 0
++                progressTimer.stop()
++            }
++            enabled: progressTimer.running
+         }
+     }
+ 
+@@ -193,8 +340,8 @@ SilicaListView {
+ 
+             highlighted: false
+             highlightedColor: highlightBackgroundColor != undefined
+-                        ? highlightBackgroundColor
+-                        : Theme.highlightBackgroundColor
++                              ? highlightBackgroundColor
++                              : Theme.highlightBackgroundColor
+ 
+             onPressed: powerMenu.currentIndex = index
+             onClicked: {

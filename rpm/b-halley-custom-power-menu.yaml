@@ -1,0 +1,41 @@
+Name: b-halley-custom-power-menu
+Summary: Patch - Custom Power Menu
+Version: 0.3.1
+Release: 1
+BuildArch: noarch
+# The contents of the Group field should be one of the groups listed here:
+# http://gitorious.org/meego-developer-tools/spectacle/blobs/master/data/GROUPS
+Group: Applications/Productivity
+URL: https://openrepos.net/users/billyhalley
+License: GPLv2+
+# This must be generated before uploading a package to a remote build service.
+# Usually this line does not need to be modified.
+Sources:
+- '%{name}-%{version}.tar.bz2'
+Description: |
+ Short description of my SailfishOS Application
+# The qtc5 builder inserts macros to allow QtCreator to have fine
+# control over qmake/make execution
+Builder: qtc5
+
+# This section specifies build dependencies that are resolved using pkgconfig.
+# This is the preferred way of specifying build dependencies for your package.
+#PkgConfigBR:
+
+# Build dependencies without a pkgconfig setup can be listed here
+# PkgBR:
+#   - package-needed-to-build
+
+# Runtime dependencies which are not automatically detected
+Requires:
+  - patchmanager
+  - sailfish-version >= 1.1.1-10.22.26.jolla.armv7hl
+
+# All installed files
+Files:
+  - '%{_datadir}/patchmanager'
+  - '%{_datadir}/jolla-settings/pages'
+  - '%{_datadir}/jolla-settings/entries'
+
+# For more information about yaml and what's supported in Sailfish OS
+# build system, please see https://wiki.merproject.org/wiki/Spectacle

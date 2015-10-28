@@ -36,14 +36,14 @@ OTHER_FILES += \
     rpm/b-halley-custom-power-menu.spec \
     rpm/b-halley-custom-power-menu.yaml \
     data/patch.json \
-    data/unified_diff.patch \
     settings/b-halley-custom-power-menu.json \
     settings/main.qml \
     rpm/b-halley-custom-power-menu.changes \
     settings/SettingsPowerButton.qml \
     settings/PowerPage.qml \
     settings/LockPage.qml \
-    qml/b/PowerButton.qml \
-    qml/b/PowerKeyMenu.qml \
-    qml/a/PowerButton.qml \
-    qml/a/PowerKeyMenu.qml
+    qml/a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml \
+    qml/a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml \
+    qml/b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml \
+    qml/b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml \
+    data/unified_diff.patch

@@ -2,11 +2,10 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import org.nemomobile.configuration 1.0
 
-
 Page {
     id: page
-    property var widgets: ["lock","shutdown","reboot","lipstick","profile"]
-    property var names: ["Lock","Shutdown","Reboot","Restart HS","Change Profile"]
+    property var widgets: ["lock","shutdown","reboot","lipstick","profile","screenshot"]
+    property var names: ["Lock","Shutdown","Reboot","Restart HS","Change Profile","Screenshot"]
 
     ConfigurationGroup {
         id: powermenuSettings

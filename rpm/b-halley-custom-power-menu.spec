@@ -13,8 +13,8 @@ Name:       b-halley-custom-power-menu
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Patch - Custom Power Menu
-Version:    0.3.1
-Release:    1
+Version:    0.4.1
+Release:    4
 Group:      Applications/Productivity
 License:    GPLv2+
 BuildArch:  noarch

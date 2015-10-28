@@ -21,6 +21,8 @@ Item {
             "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-restart-lipstick.png"
         else if ( type === "profile" )
             profileControl.profile === "silent" ? "image://theme/graphic-sound-silent-off" : "image://theme/graphic-sound-silent-on"
+        else if ( type === "screenshot")
+            "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-m-screenshot.png"
         else if ( type === "app" )
             ""
         else if ( type === "empty" )
@@ -31,19 +33,16 @@ Item {
         switch ( type ) {
         case "shutdown":
             return "Shutdown"
-            break
         case "lock":
-            return "Lock"
-            break
+            return "Lock Screen"
         case "reboot":
             return "Reboot"
-            break
         case "lipstick":
             return "Restart HS"
-            break
         case "profile":
             return profileControl.profile === "silent" ? "Enable Sounds" : "Disable Sounds"
-            break
+        case "screenshot":
+            return "Screenshot"
         case "app":
             break
         case "empty":

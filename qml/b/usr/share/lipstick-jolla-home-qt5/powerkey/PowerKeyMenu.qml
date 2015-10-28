@@ -35,9 +35,28 @@ SilicaListView {
         path: '/org/freedesktop/systemd1/unit/lipstick_2eservice'
         iface: 'org.freedesktop.systemd1.Unit'
     }
+    DBusInterface {
+        id: screenshotInterface
+        bus: DBus.SessionBus
+        service: "org.nemomobile.lipstick"
+        path: "/org/nemomobile/lipstick/screenshot"
+        iface: "org.nemomobile.lipstick"
+    }
 
     ProfileControl {
         id: profileControl
+    }
+
+    Timer {
+        id: screenshotTimer
+        interval: 401
+        repeat: false
+        onTriggered: {
+            var currentDate = new Date()
+            var hours = currentDate.getHours() === 0 ? "00" : currentDate.getHours()
+            var date = currentDate.getFullYear() + "-" + ( currentDate.getMonth() + 1 ) + "-" + currentDate.getDate() +  "_" + hours + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds() + "." + currentDate.getMilliseconds()
+            screenshotInterface.call("saveScreenshot", "/home/nemo/Pictures/Screenshots/Screenshot_%1.png".arg(date))
+        }
     }
 
     function action(type) {
@@ -51,11 +70,14 @@ SilicaListView {
             systemdServiceIface.call("Restart", ["replace"])
         else if ( type === "profile" )
             profileControl.profile = profileControl.profile === "silent" ? "ambience" : "silent"
-        else if ( type === "app" ) {
+        else if ( type === "screenshot") {
+            screenshotTimer.start()
+        } else if ( type === "app" ) {
             
         } else if ( type === "empty" ) {
             
         }
+        Lipstick.compositor.powerKeyLayer.hide()
     }
 
     property real itemHeight: Screen.sizeCategory >= Screen.Large
@@ -178,7 +200,7 @@ SilicaListView {
         }
 
         property var powerArray: powermenuSettings.powerArray.length === 0 ? ["shutdown"] : powermenuSettings.powerArray
-        property var powerWidth: powerMenu.width / powerArray.length
+        property real powerWidth: powerMenu.width / powerArray.length
         onPowerArrayChanged: {
             powerModel.clear()
             for ( var i = 0; i < powerArray.length; i++) {

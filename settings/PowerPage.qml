@@ -4,8 +4,8 @@ import org.nemomobile.configuration 1.0
 
 Page {
     id: page
-    property var widgets: ["lock","shutdown","reboot","lipstick","profile","screenshot"]
-    property var names: ["Lock","Shutdown","Reboot","Restart HS","Change Profile","Screenshot"]
+    property var widgets: ["lock","shutdown","reboot","lipstick","profile","screenshot","lockdevice"]
+    property var names: ["Lock","Shutdown","Reboot","Restart HS","Change Profile","Screenshot","Lock Device"]
 
     ConfigurationGroup {
         id: powermenuSettings
@@ -16,7 +16,7 @@ Page {
         property variant powerArray: ["shutdown"]
         property variant quickOrder: [0]
         property real lockInterval: 1
-        property real quickPower: 0
+        property int quickPower: 0
         property real powerInterval: 1
     }
 

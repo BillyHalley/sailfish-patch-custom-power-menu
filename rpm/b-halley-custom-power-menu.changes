@@ -8,7 +8,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sat Sep 19 2015 Billy Halley <ziobilly94@gmail.com> 0.4.1-4
+* Wed Oct 28 2015 Billy Halley <ziobilly94@gmail.com> 0.5.1-1
+v 0.5.1
+- Included Lock Device Widget (Thanks to alina's idea)
+
 v 0.4.1
 - Included Screenshot Widget ( To use in Lock Menu the "Swipe to close app" function should be disabled in Settings->System->Gestures )
 

@@ -23,6 +23,8 @@ Item {
             profileControl.profile === "silent" ? "image://theme/graphic-sound-silent-off" : "image://theme/graphic-sound-silent-on"
         else if ( type === "screenshot")
             "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-m-screenshot.png"
+        else if ( type === "lockdevice")
+            "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-m-lock-device.png"
         else if ( type === "app" )
             ""
         else if ( type === "empty" )
@@ -43,6 +45,8 @@ Item {
             return profileControl.profile === "silent" ? "Enable Sounds" : "Disable Sounds"
         case "screenshot":
             return "Screenshot"
+        case "lockdevice":
+            return "Lock Device"
         case "app":
             break
         case "empty":

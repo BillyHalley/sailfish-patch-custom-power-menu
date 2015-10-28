@@ -72,6 +72,9 @@ SilicaListView {
             profileControl.profile = profileControl.profile === "silent" ? "ambience" : "silent"
         else if ( type === "screenshot") {
             screenshotTimer.start()
+        } else if ( type === "lockdevice" ) {
+            deviceLock.setState(1)
+            Lipstick.compositor.setDisplayOff()
         } else if ( type === "app" ) {
             
         } else if ( type === "empty" ) {

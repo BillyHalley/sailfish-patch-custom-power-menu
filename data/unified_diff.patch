@@ -1,8 +1,8 @@
 diff --git /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
-index adf3ab2..17c5221 100644
+index adf3ab2..09a8041 100644
 --- /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
 +++ /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
-@@ -1,19 +1,72 @@
+@@ -1,19 +1,76 @@
  import QtQuick 2.2
  import Sailfish.Silica 1.0
  
@@ -32,6 +32,8 @@ index adf3ab2..17c5221 100644
 +            profileControl.profile === "silent" ? "image://theme/graphic-sound-silent-off" : "image://theme/graphic-sound-silent-on"
 +        else if ( type === "screenshot")
 +            "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-m-screenshot.png"
++        else if ( type === "lockdevice")
++            "/usr/share/patchmanager/patches/b-halley-custom-power-menu/icons/graphic-m-lock-device.png"
 +        else if ( type === "app" )
 +            ""
 +        else if ( type === "empty" )
@@ -52,6 +54,8 @@ index adf3ab2..17c5221 100644
 +            return profileControl.profile === "silent" ? "Enable Sounds" : "Disable Sounds"
 +        case "screenshot":
 +            return "Screenshot"
++        case "lockdevice":
++            return "Lock Device"
 +        case "app":
 +            break
 +        case "empty":
@@ -80,7 +84,7 @@ index adf3ab2..17c5221 100644
          duration: 50
      }
  
-@@ -24,12 +77,9 @@ MouseArea {
+@@ -24,12 +81,9 @@ MouseArea {
          height: button.height
  
          color: Theme.rgba(Theme.highlightBackgroundColor, Theme.highlightBackgroundOpacity)
@@ -93,7 +97,7 @@ index adf3ab2..17c5221 100644
              source: button.down
                      ? button.iconSource + "?" + Theme.highlightColor
                      : button.iconSource
-@@ -37,5 +87,19 @@ MouseArea {
+@@ -37,5 +91,19 @@ MouseArea {
              width: Theme.iconSizeLauncher
              height: Theme.iconSizeLauncher
          }
@@ -114,10 +118,10 @@ index adf3ab2..17c5221 100644
      }
  }
 diff --git /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
-index c9a663e..bdd1336 100644
+index c9a663e..97c150e 100644
 --- /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
 +++ /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
-@@ -9,20 +9,87 @@ import org.nemomobile.dbus 2.0
+@@ -9,20 +9,90 @@ import org.nemomobile.dbus 2.0
  import com.jolla.lipstick 0.1
  import org.freedesktop.contextkit 1.0
  import org.nemomobile.notifications 1.0 as SystemNotifications
@@ -184,6 +188,9 @@ index c9a663e..bdd1336 100644
 +            profileControl.profile = profileControl.profile === "silent" ? "ambience" : "silent"
 +        else if ( type === "screenshot") {
 +            screenshotTimer.start()
++        } else if ( type === "lockdevice" ) {
++            deviceLock.setState(1)
++            Lipstick.compositor.setDisplayOff()
 +        } else if ( type === "app" ) {
 +            
 +        } else if ( type === "empty" ) {
@@ -209,7 +216,7 @@ index c9a663e..bdd1336 100644
      readonly property real stackedItemHeight: Theme.paddingSmall
      readonly property real bottomStackHeight: Math.max(0, stackedItemHeight*Math.min((powerMenu.count-itemCount+1), stackCount))
  
-@@ -89,14 +156,14 @@ SilicaListView {
+@@ -89,14 +159,14 @@ SilicaListView {
  
          states: [
              State {
@@ -229,7 +236,7 @@ index c9a663e..bdd1336 100644
                  }
              }
          ]
-@@ -105,7 +172,7 @@ SilicaListView {
+@@ -105,7 +175,7 @@ SilicaListView {
              from: "no-power"
              to: "power"
              NumberAnimation {
@@ -238,7 +245,7 @@ index c9a663e..bdd1336 100644
                  property: "offset"
                  duration: 400
                  easing.type: Easing.InOutQuad
-@@ -113,44 +180,146 @@ SilicaListView {
+@@ -113,44 +183,146 @@ SilicaListView {
          }
  
          Wallpaper {
@@ -412,7 +419,7 @@ index c9a663e..bdd1336 100644
          }
      }
  
-@@ -193,8 +362,8 @@ SilicaListView {
+@@ -193,8 +365,8 @@ SilicaListView {
  
              highlighted: false
              highlightedColor: highlightBackgroundColor != undefined

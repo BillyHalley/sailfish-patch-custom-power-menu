@@ -4,8 +4,8 @@ import org.nemomobile.configuration 1.0
 
 Page {
     id: page
-    property var widgets: ["lock","shutdown","reboot","lipstick","profile","screenshot"]
-    property var names: ["Lock","Shutdown","Reboot","Restart HS","Change Profile","Screenshot"]
+    property var widgets: ["lock","shutdown","reboot","lipstick","profile","screenshot","lockdevice"]
+    property var names: ["Lock","Shutdown","Reboot","Restart HS","Change Profile","Screenshot","Lock Device"]
 
     ConfigurationGroup {
         id: powermenuSettings
